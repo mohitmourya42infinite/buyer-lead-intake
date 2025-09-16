@@ -98,6 +98,33 @@ Unit tests live in `src/tests`. Add Vitest config if you expand coverage.
   - The app uses session JWTs via NextAuth. For quick local API testing, send `Cookie: next-auth.session-token=...` from your browser session.
   - Alternatively, for very quick development with a proxy or custom client, you can simulate a user via `x-user-email` header if you add a tiny dev-only handler around `authorize` (not included by default). Recommended path is to authenticate via `/signin` and reuse the cookie.
 
+### Vercel Deployment
+
+1. **Connect to Vercel**:
+   ```bash
+   npm i -g vercel
+   vercel login
+   vercel
+   ```
+
+2. **Environment Variables** (set in Vercel dashboard):
+   ```
+   DATABASE_URL=postgresql://user:password@host:5432/buyer_leads
+   NEXTAUTH_SECRET=your-production-secret-key
+   NEXTAUTH_URL=https://your-app.vercel.app
+   NEXT_PUBLIC_BASE_URL=https://your-app.vercel.app
+   ```
+
+3. **Database Setup**:
+   - Use Vercel Postgres, PlanetScale, or Supabase
+   - Run migrations: `npx prisma migrate deploy`
+   - Generate client: `npx prisma generate`
+
+4. **Build Settings**:
+   - Framework: Next.js
+   - Build Command: `npm run build`
+   - Output Directory: `.next`
+
 ### Notes for production
 
 - Replace SQLite with Postgres/MySQL in `prisma/schema.prisma` and update `DATABASE_URL`.

@@ -2,6 +2,7 @@
   "name": "buyer-leads",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://buyer-leads.vercel.app",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",

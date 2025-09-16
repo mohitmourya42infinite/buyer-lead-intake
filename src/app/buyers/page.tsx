@@ -1,18 +1,28 @@
 import Link from "next/link";
+import EmptyState from "@/components/EmptyState";
+import { cookies } from "next/headers";
 
 async function fetchBuyers(searchParams: Record<string, string | string[] | undefined>) {
   const params = new URLSearchParams();
   for (const [k, v] of Object.entries(searchParams)) {
     if (typeof v === "string" && v) params.set(k, v);
   }
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL ?? ""}/api/buyers?${params.toString()}`, { cache: "no-store" });
+  const base = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
+  const url = `${base}/api/buyers${params.toString() ? `?${params.toString()}` : ""}`;
+  const res = await fetch(url, {
+    cache: "no-store",
+    headers: { cookie: cookieHeader },
+  });
   if (!res.ok) throw new Error("Failed to load buyers");
   return res.json();
 }
 
-export default async function BuyersPage({ searchParams }: { searchParams: Record<string, string | string[] | undefined> }) {
-  const { items, total, page, pageSize } = await fetchBuyers(searchParams);
-  const qp = new URLSearchParams(searchParams as Record<string, string>);
+export default async function BuyersPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const sp = await searchParams;
+  const { items, total, page, pageSize } = await fetchBuyers(sp);
+  const qp = new URLSearchParams(sp as Record<string, string>);
   const currentPage = Math.max(1, Number(qp.get("page") ?? 1));
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   return (
@@ -21,6 +31,10 @@ export default async function BuyersPage({ searchParams }: { searchParams: Recor
         <h1 className="text-2xl font-semibold">Buyers</h1>
         <Link href="/buyers/new" className="bg-black text-white rounded px-3 py-2">New</Link>
       </div>
+      {items.length === 0 ? (
+        <EmptyState />
+      ) : (
+      <>
       <form className="mb-4 grid grid-cols-1 md:grid-cols-4 gap-2" action="/buyers">
         <input name="q" placeholder="Search name/phone/email" className="input" defaultValue={qp.get("q") ?? ""} />
         <select name="city" className="input" defaultValue={qp.get("city") ?? ""}>
@@ -80,6 +94,8 @@ export default async function BuyersPage({ searchParams }: { searchParams: Recor
         <span className="text-sm">Page {page} of {totalPages}</span>
         <PaginationLink disabled={currentPage>=totalPages} href={`/buyers?${new URLSearchParams({ ...Object.fromEntries(qp), page: String(currentPage+1) }).toString()}`}>Next</PaginationLink>
       </div>
+      </>
+      )}
     </div>
   );
 }
