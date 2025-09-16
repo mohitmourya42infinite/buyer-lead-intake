@@ -4,11 +4,12 @@
   "private": true,
   "homepage": "https://buyer-leads.vercel.app",
   "scripts": {
-    "dev": "next dev",            // removed --turbopack
-    "build": "next build",        // removed --turbopack
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest"
+    "test": "vitest",
+    "postinstall": "prisma generate && prisma migrate deploy"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
