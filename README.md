@@ -63,15 +63,43 @@ npm run dev
 
 ### Vercel
 
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Set environment variables in Vercel dashboard:
-   - `DATABASE_URL` - Your database connection string
-   - `NEXTAUTH_SECRET` - A random secret for authentication
-   - `NEXTAUTH_URL` - Your app's URL
-   - `NEXT_PUBLIC_BASE_URL` - Your app's public URL
+1. **Set up a PostgreSQL database** (required for production):
+   - **Vercel Postgres** (recommended): Go to your Vercel dashboard → Storage → Create Database → Postgres
+   - **Supabase**: Create a new project at [supabase.com](https://supabase.com)
+   - **Railway**: Create a PostgreSQL database at [railway.app](https://railway.app)
+   - **Neon**: Create a database at [neon.tech](https://neon.tech)
 
-4. Deploy!
+2. **Connect your repository to Vercel**:
+   - Go to [vercel.com](https://vercel.com)
+   - Click "New Project"
+   - Import your GitHub repository
+
+3. **Set environment variables in Vercel dashboard**:
+   - `DATABASE_URL` - Your PostgreSQL connection string (e.g., `postgresql://user:password@host:5432/dbname`)
+   - `NEXTAUTH_SECRET` - Generate with: `openssl rand -base64 32`
+   - `NEXTAUTH_URL` - Your app's URL (e.g., `https://your-app.vercel.app`)
+   - `NEXT_PUBLIC_BASE_URL` - Your app's public URL (e.g., `https://your-app.vercel.app`)
+
+4. **Deploy!** Vercel will automatically:
+   - Install dependencies
+   - Generate Prisma client
+   - Run database migrations
+   - Build and deploy your app
+
+### Environment Variables
+
+**Required for production:**
+```bash
+DATABASE_URL="postgresql://username:password@hostname:5432/database_name"
+NEXTAUTH_SECRET="your-secret-key-here"
+NEXTAUTH_URL="https://your-app.vercel.app"
+NEXT_PUBLIC_BASE_URL="https://your-app.vercel.app"
+```
+
+**Example PostgreSQL URLs:**
+- Vercel Postgres: `postgres://default:password@ep-xxx.us-east-1.postgres.vercel-storage.com/verceldb`
+- Supabase: `postgresql://postgres:password@db.xxx.supabase.co:5432/postgres`
+- Railway: `postgresql://postgres:password@containers-us-west-xxx.railway.app:5432/railway`
 
 ## Tech Stack
 
