@@ -4,8 +4,8 @@
   "private": true,
   "homepage": "https://buyer-leads.vercel.app",
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "dev": "next dev",            // removed --turbopack
+    "build": "next build",        // removed --turbopack
     "start": "next start",
     "lint": "eslint",
     "test": "vitest"
