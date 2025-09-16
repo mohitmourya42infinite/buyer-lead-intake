@@ -5,17 +5,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { buyerSchema, type BuyerInput, cityEnum, propertyTypeEnum, bhkEnum, purposeEnum, timelineEnum, sourceEnum, statusEnum } from "@/lib/validation";
 import { useRouter } from "next/navigation";
 
-export default function BuyerDetailPage({ params }: { params: { id: string } }) {
+export default function BuyerDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [updatedAt, setUpdatedAt] = useState<string>("");
   const [history, setHistory] = useState<any[]>([]);
-  const form = useForm<BuyerInput>({ resolver: zodResolver(buyerSchema) });
+  const [buyerId, setBuyerId] = useState<string>("");
+  const form = useForm({ resolver: zodResolver(buyerSchema) });
   const propertyTypeWatch = form.watch("propertyType");
 
   useEffect(() => {
     (async () => {
-      const res = await fetch(`/api/buyers/${params.id}`);
+      const { id } = await params;
+      setBuyerId(id);
+      const res = await fetch(`/api/buyers/${id}`);
       const data = await res.json();
       if (res.ok) {
         const b = data.buyer;
@@ -25,7 +28,7 @@ export default function BuyerDetailPage({ params }: { params: { id: string } }) 
           phone: b.phone,
           city: b.city,
           propertyType: b.propertyType,
-          bhk: b.bhk === "Studio" ? "Studio" : b.bhk ? ({ One: "1", Two: "2", Three: "3", Four: "4" } as const)[b.bhk as keyof any] : undefined,
+          bhk: b.bhk === "Studio" ? "Studio" : b.bhk ? (b.bhk === "One" ? "1" : b.bhk === "Two" ? "2" : b.bhk === "Three" ? "3" : b.bhk === "Four" ? "4" : undefined) : undefined,
           purpose: b.purpose,
           budgetMin: b.budgetMin ?? undefined,
           budgetMax: b.budgetMax ?? undefined,
@@ -40,10 +43,10 @@ export default function BuyerDetailPage({ params }: { params: { id: string } }) 
       } else alert("Failed to load");
       setLoading(false);
     })();
-  }, [params.id]);
+  }, [params]);
 
   async function onSubmit(values: BuyerInput) {
-    const res = await fetch(`/api/buyers/${params.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...values, updatedAt }) });
+    const res = await fetch(`/api/buyers/${buyerId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...values, updatedAt }) });
     if (!res.ok) {
       const data = await res.json();
       alert(data.error?.message ?? data.error ?? "Failed to update");

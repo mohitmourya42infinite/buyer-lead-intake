@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   if (missing.length) return NextResponse.json({ error: `Missing headers: ${missing.join(', ')}` }, { status: 400 });
 
   for (let i = 0; i < records.length; i++) {
-    const r = records[i];
+    const r = records[i] as any;
     const mapped = {
       fullName: r.fullName,
       email: r.email || undefined,
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     };
     const parsed = buyerSchema.safeParse(mapped);
     if (!parsed.success) {
-      errors.push({ row: i + 2, message: parsed.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join('; ') });
+      errors.push({ row: i + 2, message: parsed.error.issues.map(e => `${e.path.join('.')}: ${e.message}`).join('; ') });
     } else {
       valid.push(parsed.data);
     }
@@ -53,14 +53,14 @@ export async function POST(req: NextRequest) {
           phone: data.phone,
           city: data.city as any,
           propertyType: data.propertyType as any,
-          bhk: (data.bhk ? (data.bhk === "Studio" ? "Studio" : ({ "1": "One", "2": "Two", "3": "Three", "4": "Four" } as const)[data.bhk]) : null) as any,
+          bhk: (data.bhk ? (data.bhk === "Studio" ? "Studio" : (data.bhk === "1" ? "One" : data.bhk === "2" ? "Two" : data.bhk === "3" ? "Three" : data.bhk === "4" ? "Four" : null)) : null) as any,
           purpose: data.purpose as any,
           budgetMin: data.budgetMin ?? null,
           budgetMax: data.budgetMax ?? null,
           timeline: (data.timeline === "0-3m" ? "T0_3m" : data.timeline === "3-6m" ? "T3_6m" : data.timeline === ">6m" ? "GT6m" : "Exploring") as any,
           source: (data.source === "Walk-in" ? "Walk_in" : data.source) as any,
           notes: data.notes ?? null,
-          tags: data.tags ?? null,
+          tags: data.tags ?? undefined,
           status: data.status as any,
           ownerId: "import", // for demo; real app should use session
         },

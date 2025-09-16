@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
       b.phone,
       b.city,
       b.propertyType,
-      b.bhk === "Studio" ? "Studio" : b.bhk ? ({ One: "1", Two: "2", Three: "3", Four: "4" } as const)[b.bhk as keyof any] : "",
+      b.bhk === "Studio" ? "Studio" : b.bhk ? (b.bhk === "One" ? "1" : b.bhk === "Two" ? "2" : b.bhk === "Three" ? "3" : b.bhk === "Four" ? "4" : "") : "",
       b.purpose,
       b.budgetMin?.toString() ?? "",
       b.budgetMax?.toString() ?? "",

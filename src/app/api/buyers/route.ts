@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { buyerSchema } from "@/lib/validation";
 import { rateLimit } from "@/lib/ratelimit";
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions as any);
+  const session = await getServerSession(authOptions);
   if (!session?.user?.email || !session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
         timeline: (data.timeline === "0-3m" ? "T0_3m" : data.timeline === "3-6m" ? "T3_6m" : data.timeline === ">6m" ? "GT6m" : "Exploring") as any,
         source: (data.source === "Walk-in" ? "Walk_in" : data.source) as any,
         notes: data.notes ?? null,
-        tags: data.tags ?? null,
+        tags: data.tags ?? undefined,
         status: data.status as any,
         ownerId: session.user!.id as string,
       },
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions as any);
+  const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { searchParams } = new URL(req.url);

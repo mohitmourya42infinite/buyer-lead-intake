@@ -8,7 +8,7 @@ import { useState } from "react";
 export default function NewBuyerPage() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
-  const form = useForm<BuyerInput>({ resolver: zodResolver(buyerSchema), defaultValues: { status: "New" } });
+  const form = useForm({ resolver: zodResolver(buyerSchema), defaultValues: { status: "New" } });
   const propertyTypeWatch = form.watch("propertyType");
 
   async function onSubmit(values: BuyerInput) {

@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { buyerSchema } from "@/lib/validation";
 import { rateLimit } from "@/lib/ratelimit";
 
 export async function GET(
   _req: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = context.params;
+  const { id } = await context.params;
   const buyer = await prisma.buyer.findUnique({ where: { id } });
   if (!buyer) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
@@ -24,11 +24,11 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = context.params;
+  const { id } = await context.params;
 
-  const session = await getServerSession(authOptions as any);
+  const session = await getServerSession(authOptions);
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const json = await req.json();
@@ -75,7 +75,7 @@ export async function PUT(
         : "Exploring",
     source: data.source === "Walk-in" ? "Walk_in" : data.source,
     notes: data.notes ?? null,
-    tags: data.tags ?? null,
+    tags: data.tags ?? undefined,
     status: data.status,
   };
 

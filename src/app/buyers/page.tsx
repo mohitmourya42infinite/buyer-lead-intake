@@ -67,7 +67,7 @@ export default async function BuyersPage({ searchParams }: { searchParams: Promi
               <Th>Timeline</Th>
               <Th>Status</Th>
               <Th>Updated</Th>
-              <Th></Th>
+              <Th>Actions</Th>
             </tr>
           </thead>
           <tbody>
